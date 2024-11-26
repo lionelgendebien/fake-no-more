@@ -89,13 +89,6 @@ merged_df = (mfccs_df
              .merge(spectral_bandwidth_df, on='index', how='outer')
              .merge(spectral_rolloff_df, on='index', how='outer'))
 
-# merged_df = merged_df.merge(data[['file_index', 'label']], left_on='index', right_on='file_index', how='left')
-
-# merged_df = merged_df.drop(columns=['file_index'])
-
-# print(merged_df)
-# merged_df.to_parquet('data_mean.parquet', engine='pyarrow')
-
 # # Import the label (Fake or Real)
 csv_path=os.path.join(absolute_path, "meta.csv")
 mapping_file=pd.read_csv(csv_path)
