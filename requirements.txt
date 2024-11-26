@@ -17,3 +17,7 @@ pandas==2.1.4
 # API
 fastapi
 uvicorn
+
+#Librosa
+librosa
+
