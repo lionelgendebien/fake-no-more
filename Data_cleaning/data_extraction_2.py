@@ -1,6 +1,7 @@
 import pandas as pd
 import librosa
 import os
+import numpy as np
 
 # Current working directory
 current_dir = os.getcwd()
@@ -19,50 +20,69 @@ zero_crossing_rate_df = pd.DataFrame()
 spectral_bandwidth_df = pd.DataFrame()
 spectral_rolloff_df = pd.DataFrame()
 
+# Create load and preprocess function
+SAMPLE_RATE = 16000
+DURATION = 1
+MAX_LEN = SAMPLE_RATE * DURATION
+
+# def load_and_preprocess_audio(file_path, sr=SAMPLE_RATE, duration=DURATION):
+#     y, _ = librosa.load(file_path, sr=sr, duration=duration)
+#     if len(y) < MAX_LEN:
+#         y = np.pad(y, (0, MAX_LEN - len(y)), mode='constant')
+#     else:
+#         y = y[:MAX_LEN]
+#     return y
+
 for file_num in range(0, 3000):
     # Load audio file
     audio_file = os.path.join(absolute_path, f'{file_num}.wav')
-    y, sr = librosa.load(audio_file, sr=16000, duration=5)
+    y, _ = librosa.load(audio_file, sr=SAMPLE_RATE, duration=DURATION)
 
-    # Extract features
-    mfccs = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=20)
-    chroma_stft = librosa.feature.chroma_stft(y=y, sr=sr, n_chroma=1)
-    spectral_contrast = librosa.feature.spectral_contrast(y=y, sr=sr, n_bands=6)
-    zero_crossing_rate = librosa.feature.zero_crossing_rate(y)
-    spectral_bandwidth = librosa.feature.spectral_bandwidth(y=y, sr=sr)
-    spectral_rolloff = librosa.feature.spectral_rolloff(y=y, sr=sr)
+    if len(y) >= MAX_LEN:
+        # Find the starting index for the 1-second extract at the middle
+        middle_start = int((len(y) - SAMPLE_RATE * DURATION) / 2)
+        # Extract the 1-second segment from the middle
+        y = y[middle_start:middle_start + SAMPLE_RATE * DURATION]
 
-    # Create DataFrames for each feature
-    mfccs_temp_df = pd.DataFrame(mfccs.T, columns=[f'mfcc_{i+1}' for i in range(mfccs.shape[0])])
-    mfccs_temp_df['file_index'] = file_num
+        # Extract features
+        mfccs = librosa.feature.mfcc(y=y, sr=SAMPLE_RATE, n_mfcc=20)
+        chroma_stft = librosa.feature.chroma_stft(y=y, sr=SAMPLE_RATE, n_chroma=1)
+        spectral_contrast = librosa.feature.spectral_contrast(y=y, sr=SAMPLE_RATE, n_bands=6)
+        zero_crossing_rate = librosa.feature.zero_crossing_rate(y)
+        spectral_bandwidth = librosa.feature.spectral_bandwidth(y=y, sr=SAMPLE_RATE)
+        spectral_rolloff = librosa.feature.spectral_rolloff(y=y, sr=SAMPLE_RATE)
 
-    chroma_temp_df = pd.DataFrame(chroma_stft.T, columns=['chroma'])
+        # Create DataFrames for each feature
+        mfccs_temp_df = pd.DataFrame(mfccs.T, columns=[f'mfcc_{i+1}' for i in range(mfccs.shape[0])])
+        mfccs_temp_df['file_index'] = file_num
 
-    spectral_contrast_temp_df = pd.DataFrame(spectral_contrast.T, columns=[f'spectral_contrast_band_{i+1}' for i in range(spectral_contrast.shape[0])])
+        chroma_temp_df = pd.DataFrame(chroma_stft.T, columns=['chroma'])
 
-    zero_crossing_temp_df = pd.DataFrame(zero_crossing_rate.T, columns=['zero_crossing_rate'])
+        spectral_contrast_temp_df = pd.DataFrame(spectral_contrast.T, columns=[f'spectral_contrast_band_{i+1}' for i in range(spectral_contrast.shape[0])])
 
-    spectral_bandwidth_temp_df = pd.DataFrame(spectral_bandwidth.T, columns=['spectral_bandwidth'])
+        zero_crossing_temp_df = pd.DataFrame(zero_crossing_rate.T, columns=['zero_crossing_rate'])
 
-    spectral_rolloff_temp_df = pd.DataFrame(spectral_rolloff.T, columns=['spectral_rolloff'])
+        spectral_bandwidth_temp_df = pd.DataFrame(spectral_bandwidth.T, columns=['spectral_bandwidth'])
 
-    # Concatenate to main DataFrames
-    mfccs_df = pd.concat([mfccs_df, mfccs_temp_df], ignore_index=True)
-    chroma_stft_df = pd.concat([chroma_stft_df, chroma_temp_df], ignore_index=True)
-    spectral_contrast_df = pd.concat([spectral_contrast_df, spectral_contrast_temp_df], ignore_index=True)
-    zero_crossing_rate_df = pd.concat([zero_crossing_rate_df, zero_crossing_temp_df], ignore_index=True)
-    spectral_bandwidth_df = pd.concat([spectral_bandwidth_df, spectral_bandwidth_temp_df], ignore_index=True)
-    spectral_rolloff_df = pd.concat([spectral_rolloff_df, spectral_rolloff_temp_df], ignore_index=True)
+        spectral_rolloff_temp_df = pd.DataFrame(spectral_rolloff.T, columns=['spectral_rolloff'])
 
-# Merge all feature DataFrames on 'file_index'
-merged_df = (mfccs_df
-             .merge(chroma_stft_df, left_index=True, right_index=True, how='inner')
-             .merge(spectral_contrast_df, left_index=True, right_index=True, how='inner')
-             .merge(zero_crossing_rate_df, left_index=True, right_index=True, how='inner')
-             .merge(spectral_bandwidth_df, left_index=True, right_index=True, how='inner')
-             .merge(spectral_rolloff_df, left_index=True, right_index=True, how='inner'))
+        # Concatenate to main DataFrames
+        mfccs_df = pd.concat([mfccs_df, mfccs_temp_df], ignore_index=True)
+        chroma_stft_df = pd.concat([chroma_stft_df, chroma_temp_df], ignore_index=True)
+        spectral_contrast_df = pd.concat([spectral_contrast_df, spectral_contrast_temp_df], ignore_index=True)
+        zero_crossing_rate_df = pd.concat([zero_crossing_rate_df, zero_crossing_temp_df], ignore_index=True)
+        spectral_bandwidth_df = pd.concat([spectral_bandwidth_df, spectral_bandwidth_temp_df], ignore_index=True)
+        spectral_rolloff_df = pd.concat([spectral_rolloff_df, spectral_rolloff_temp_df], ignore_index=True)
 
-# # Import the label (Fake or Real)
+        # Merge all feature DataFrames on 'file_index'
+        merged_df = (mfccs_df
+                    .merge(chroma_stft_df, left_index=True, right_index=True, how='inner')
+                    .merge(spectral_contrast_df, left_index=True, right_index=True, how='inner')
+                    .merge(zero_crossing_rate_df, left_index=True, right_index=True, how='inner')
+                    .merge(spectral_bandwidth_df, left_index=True, right_index=True, how='inner')
+                    .merge(spectral_rolloff_df, left_index=True, right_index=True, how='inner'))
+
+# Import the label (Fake or Real)
 csv_path=os.path.join(absolute_path, "meta.csv")
 mapping_file=pd.read_csv(csv_path)
 mapping_file['file_index']=mapping_file.file.str.replace('.wav', '', regex=False).astype(int)
