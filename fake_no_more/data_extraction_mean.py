@@ -9,7 +9,7 @@ import pyarrow.parquet as pq
 current_dir = os.getcwd()
 
 # Define relative path
-relative_path = "raw_data/raw_data/release_in_the_wild/"
+relative_path = "raw_data/release_in_the_wild/"
 
 # Define absolute path
 absolute_path = os.path.join(current_dir, relative_path)
@@ -103,4 +103,4 @@ data_df = merged_df.merge(mapping_file, on='index',how='inner')
 print(data_df)
 
 # Export as Parquet file
-data_df.to_parquet('data_mean.parquet', engine='pyarrow')
+data_df.to_parquet('raw_data/data_3000_mean.parquet', engine='pyarrow')
