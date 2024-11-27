@@ -96,4 +96,4 @@ master_audio_df_all=merged_df.merge(mapping_file, on='file_index',how='inner')
 print(master_audio_df_all)
 
 # Export as Parquet file
-master_audio_df_all.to_parquet('master_audio_df_3000_all.parquet', engine='pyarrow')
+master_audio_df_all.to_parquet('raw_data/master_audio_df_3000_all.parquet', engine='pyarrow')
