@@ -3,9 +3,11 @@ from tensorflow.keras.layers import Input, LSTM, Dropout, Dense, Conv2D, BatchNo
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import BinaryCrossentropy
 from tensorflow.keras.callbacks import EarlyStopping
+import matplotlib.pyplot as plt
+import seaborn as sns
 import pandas as pd
 
-from fake_no_more.data_preprocessing import process_data
+from fake_no_more.data_preprocessing import process_data, process_data_LSTM
 
 
 def reshape_x(X_train_scaled, X_val_scaled, X_test_scaled):
@@ -16,7 +18,7 @@ def reshape_x(X_train_scaled, X_val_scaled, X_test_scaled):
 
 def initialize_model_LSTM():
     model_LSTM = Sequential()
-    model_LSTM.add(Input(shape=(1,31)))
+    model_LSTM.add(Input(shape=(X_train_scaled[1],X_train_scaled[2])))
 
     # First LSTM layer
     model_LSTM.add(LSTM(64, return_sequences=True))
@@ -52,17 +54,20 @@ def initialize_model_LSTM():
 def fit_LSTM(model):
     callback = EarlyStopping(patience= 5, restore_best_weights = True)
     model = initialize_model_LSTM()
-    history = model.fit(X_train_reshaped, y_train, epochs=50, callbacks = callback, validation_data=(X_val_reshaped, y_val))
+    history = model.fit(X_train, y_train, epochs=50, callbacks = callback, validation_data=(X_val, y_val))
     return history
 
 def evaluate_LSTM(model):
-    score = model.evaluate(X_test_reshaped, y_test)
-    return score 
+    score = model.evaluate(X_test, y_test)
+    return score         
 
-
-df=pd.read_parquet('raw_data/master_audio_df_3000_all.parquet', engine='pyarrow')
-X_train_scaled, X_test_scaled, X_val_scaled, y_train, y_test, y_val=process_data(df)
-X_train_reshaped, X_val_reshaped, X_test_reshaped = reshape_x(X_train_scaled, X_val_scaled, X_test_scaled)
+df=pd.read_parquet('raw_data/master_audio_df_balanced_all.parquet', engine='pyarrow')
+X_train, X_test, X_val, y_train, y_test, y_val=process_data_LSTM(df)
+print (X_train.shape, X_test.shape, X_val.shape, y_train.shape, y_test.shape, y_val.shape)
+#X_train_reshaped, X_val_reshaped, X_test_reshaped = reshape_x(X_train_scaled, X_val_scaled, X_test_scaled)
+breakpoint()
 model = initialize_model_LSTM()
 history = fit_LSTM(model)
 score = evaluate_LSTM(model)
+print(score)
+print(plot_loss_accuracy(history, title=None))
