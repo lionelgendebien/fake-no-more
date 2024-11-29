@@ -6,19 +6,13 @@ from tensorflow.keras.callbacks import EarlyStopping
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
+import pickle
 
 from fake_no_more.data_preprocessing import process_data, process_data_LSTM
 
-
-def reshape_x(X_train_scaled, X_val_scaled, X_test_scaled):
-    X_train_reshaped = X_train_scaled.reshape(X_train_scaled.shape[0], 1, X_train_scaled.shape[1])
-    X_val_reshaped = X_val_scaled.reshape(X_val_scaled.shape[0], 1, X_val_scaled.shape[1])
-    X_test_reshaped = X_test_scaled.reshape(X_test_scaled.shape[0], 1, X_test_scaled.shape[1])
-    return X_train_reshaped, X_val_reshaped, X_test_reshaped
-
-def initialize_model_LSTM():
+def initialize_model_LSTM(X_train):
     model_LSTM = Sequential()
-    model_LSTM.add(Input(shape=(X_train_scaled[1],X_train_scaled[2])))
+    model_LSTM.add(Input(shape=(X_train[1],X_train[2])))
 
     # First LSTM layer
     model_LSTM.add(LSTM(64, return_sequences=True))
@@ -59,15 +53,24 @@ def fit_LSTM(model):
 
 def evaluate_LSTM(model):
     score = model.evaluate(X_test, y_test)
-    return score         
+    return score
 
 df=pd.read_parquet('raw_data/master_audio_df_balanced_all.parquet', engine='pyarrow')
 X_train, X_test, X_val, y_train, y_test, y_val=process_data_LSTM(df)
 print (X_train.shape, X_test.shape, X_val.shape, y_train.shape, y_test.shape, y_val.shape)
-#X_train_reshaped, X_val_reshaped, X_test_reshaped = reshape_x(X_train_scaled, X_val_scaled, X_test_scaled)
-breakpoint()
-model = initialize_model_LSTM()
+model = initialize_model_LSTM(X_train)
 history = fit_LSTM(model)
 score = evaluate_LSTM(model)
 print(score)
-print(plot_loss_accuracy(history, title=None))
+
+# Save the model
+with open('lstm.pkl', 'wb') as file:
+    pickle.dump(model, file)
+
+# # Load the model
+# with open('lstm.pkl', 'rb') as file:
+#     loaded_model = pickle.load(file)
+
+# # Use the loaded model
+# predictions = loaded_model.predict(X)
+# print(predictions)
