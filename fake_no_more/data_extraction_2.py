@@ -30,13 +30,16 @@ MAX_LEN = SAMPLE_RATE * DURATION
 csv_path="raw_data/data_mapping.csv"
 mapping_file=pd.read_csv(csv_path)
 
-# Filter:keep audio files whose total cumul length per speaker per label
-# (i.e. Fake or Real) does not exceed 40'' (NB: only 7 out of 54 speakers
-# have total audio length of either fake or real below 40'')
-filter=mapping_file.sort_values(by=['speaker', 'label', 'audio_length'], ascending=[True, True, True])
-filter['cum_audio_length'] = filter.groupby(['speaker', 'label'])['audio_length'].cumsum()
-filter=filter[filter['cum_audio_length'] <= 200]
-final_filtering=filter[['file_index', 'label']]
+# Filter 1: Augment each individual audio of < 5'' to 5''
+mapping_file_augmented=mapping_file
+mapping_file_augmented['audio_length_adjusted'] = mapping_file_augmented['audio_length'].apply(lambda x: 5 if x < 5 else x)
+
+# Filter 2: limit audio files to cum sum of 200'' after restricting each audio to 5''
+mapping_file_augmented['audio_length_adjusted'] = mapping_file_augmented['audio_length_adjusted'].apply(lambda x: 5 if x > 5 else x)
+mapping_file_augmented = mapping_file_augmented.sort_values(by=['speaker', 'label', 'audio_length'], ascending=[True, True, False])
+mapping_file_augmented['cum_audio_length_adjusted'] = mapping_file_augmented.groupby(['speaker', 'label'])['audio_length_adjusted'].cumsum()
+mapping_file_augmented_filtered = mapping_file_augmented[mapping_file_augmented['cum_audio_length_adjusted'] <= 200]
+final_filtering=mapping_file_augmented_filtered[['file_index', 'label']]
 
 for file_num in final_filtering.file_index:
     # Load audio file
