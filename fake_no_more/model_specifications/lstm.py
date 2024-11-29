@@ -10,9 +10,9 @@ import pickle
 
 from fake_no_more.data_preprocessing import process_data, process_data_LSTM
 
-def initialize_model_LSTM(X_train):
+def initialize_model_LSTM(X_train_scaled):
     model_LSTM = Sequential()
-    model_LSTM.add(Input(shape=(X_train[1],X_train[2])))
+    model_LSTM.add(Input(shape=(X_train_scaled[1],X_train_scaled[2])))
 
     # First LSTM layer
     model_LSTM.add(LSTM(64, return_sequences=True))
@@ -56,9 +56,9 @@ def evaluate_LSTM(model):
     return score
 
 df=pd.read_parquet('raw_data/master_audio_df_balanced_all.parquet', engine='pyarrow')
-X_train, X_test, X_val, y_train, y_test, y_val=process_data_LSTM(df)
-print (X_train.shape, X_test.shape, X_val.shape, y_train.shape, y_test.shape, y_val.shape)
-model = initialize_model_LSTM(X_train)
+X_train_scaled, X_test_scaled, X_val_scaled, y_train, y_test, y_val=process_data_LSTM(df)
+print (X_train_scaled.shape, X_test_scaled.shape, X_val_scaled.shape, y_train.shape, y_test.shape, y_val.shape)
+model = initialize_model_LSTM(X_train_scaled)
 history = fit_LSTM(model)
 score = evaluate_LSTM(model)
 print(score)
