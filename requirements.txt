@@ -21,3 +21,5 @@ uvicorn
 #Librosa
 librosa
 
+#Streamlit 
+streamlit
