@@ -44,7 +44,9 @@ def split_train_val(X_train, y_train):
     return X_train, X_val, y_train, y_val
 
 def split_train_val_LSTM(X_train, y_train):
-    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size = 102, random_state=42, shuffle=True)
+    num_audio = 639 
+    test_size = math.floor((num_audio -(math.ceil(num_audio * 0.2)))*0.2)
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size = test_size, random_state=42, shuffle=True)
     return X_train, X_val, y_train, y_val
 
 # Feature scaling
