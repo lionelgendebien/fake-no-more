@@ -123,6 +123,6 @@ if uploaded_file:
 
     # Button to go to the next page (second page)
     st.markdown(
-        '<button class="next-button" onclick="window.location.href=\'/pages/page_02.py\'">Next</button>',
+        '<button class="next-button" onclick="window.location.href=\'/pages/page_01.py\'">Next</button>',
         unsafe_allow_html=True,
     )
