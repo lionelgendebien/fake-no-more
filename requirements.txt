@@ -23,3 +23,8 @@ librosa
 
 #Streamlit
 streamlit
+
+#Moviepy and pytube
+pytube
+moviepy
+yt-dlp
