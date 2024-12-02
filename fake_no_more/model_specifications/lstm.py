@@ -42,25 +42,24 @@ def initialize_model_LSTM(X_train_scaled):
     # Output layer
     model_LSTM.add(Dense(1, activation='sigmoid'))
 
-    optimizer = Adam(learning_rate=0.001)
+    optimizer = Adam(learning_rate=0.0001)
     model_LSTM.compile(optimizer=optimizer, loss=BinaryCrossentropy(), metrics=['accuracy', 'precision', 'recall'])
     return model_LSTM
 
-def fit_LSTM(model):
-    callback = EarlyStopping(patience= 5, restore_best_weights = True)
-    model = initialize_model_LSTM()
-    history = model.fit(X_train, y_train, epochs=50, callbacks = callback, validation_data=(X_val, y_val))
-    return history
+def fit_LSTM(X_train_scaled, model):
+    callback = EarlyStopping(patience= 15, restore_best_weights = True)
+    model.fit(X_train_scaled, y_train, epochs=50, callbacks = callback, validation_data=(X_val_scaled, y_val))
+    return model
 
 def evaluate_LSTM(model):
-    score = model.evaluate(X_test, y_test)
+    score = model.evaluate(X_test_scaled, y_test)
     return score
 
 df=pd.read_parquet('raw_data/master_audio_df_balanced_all.parquet', engine='pyarrow')
 X_train_scaled, X_test_scaled, X_val_scaled, y_train, y_test, y_val=process_data_LSTM(df)
 print (X_train_scaled.shape, X_test_scaled.shape, X_val_scaled.shape, y_train.shape, y_test.shape, y_val.shape)
 model = initialize_model_LSTM(X_train_scaled)
-history = fit_LSTM(model)
+model = fit_LSTM(X_train_scaled, model)
 score = evaluate_LSTM(model)
 print(score)
 
