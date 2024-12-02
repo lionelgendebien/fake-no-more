@@ -14,9 +14,9 @@ def download_youtube_audio_as_wav(url, output_filename, target_directory):
     Returns:
         str: Path to the saved WAV file.
     """
-    # Ensure the directory exists
+    # Check if the directory exists, raise an error if it does not
     if not os.path.exists(target_directory):
-        os.makedirs(target_directory)
+        raise FileNotFoundError(f"The specified directory '{target_directory}' does not exist. Please provide a valid directory.")
 
     print(f"Saving file in: {target_directory}")
 
@@ -45,7 +45,7 @@ def download_youtube_audio_as_wav(url, output_filename, target_directory):
     return wav_file_path
 
 
-def process_multiple_videos(urls, target_directory="raw_data/demo_files"):
+def process_multiple_videos(urls, target_directory="../raw_data/demo_files"):
     """
     Processes multiple YouTube video URLs to download and convert them to WAV.
 
@@ -72,5 +72,8 @@ if __name__ == "__main__":
         # Add more YouTube URLs here
     ]
     
-    wav_files = process_multiple_videos(youtube_urls)
-    print(f"Converted files: {wav_files}")
+    try:
+        wav_files = process_multiple_videos(youtube_urls)
+        print(f"Converted files: {wav_files}")
+    except FileNotFoundError as e:
+        print(e)  # Handle the error if the directory does not exist

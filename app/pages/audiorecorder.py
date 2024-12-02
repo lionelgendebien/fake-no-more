@@ -2,6 +2,7 @@ import streamlit as st
 from audiorecorder import audiorecorder
 import time
 import random
+import os 
 
 # Set page config
 st.set_page_config(
@@ -60,7 +61,9 @@ if len(audio) > 0:
     st.audio(audio.export().read())
 
     # Save the audio to a file
-    audio.export("recorded_audio.wav", format="wav")
+    project_root = os.path.abspath(os.path.join(os.getcwd(), '..'))
+    audio_test_path=os.path.join(project_root, "raw_data/demo_files/recorded_audio.wav")
+    audio.export(audio_test_path, format="wav")
 
     # --- Analyze Recorded Audio ---
     st.markdown("---")
