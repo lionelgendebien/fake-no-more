@@ -71,8 +71,8 @@ def prepare_test_data(audio_test):
     # Return df
     return X_reshaped
 
-def load_model(model):
-    with open(f"{model}.pkl", 'rb') as file:
+def load_model(model_path):
+    with open(model_path, 'rb') as file:
         loaded_model = pickle.load(file)
     return loaded_model
 
