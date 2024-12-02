@@ -12,7 +12,8 @@ from fake_no_more.data_preprocessing import process_data, process_data_LSTM
 
 def initialize_model_LSTM(X_train_scaled):
     model_LSTM = Sequential()
-    model_LSTM.add(Input(shape=(X_train_scaled[1],X_train_scaled[2])))
+    model_LSTM.add(Input(shape=(X_train_scaled.shape[1], X_train_scaled.shape[2])))
+
 
     # First LSTM layer
     model_LSTM.add(LSTM(64, return_sequences=True))
