@@ -33,7 +33,8 @@ MAX_LEN = SAMPLE_RATE * DURATION
 #         y = y[:MAX_LEN]
 #     return y
 
-for file_num in range(0, 3000):
+
+for file_num in range(0, 2999):
     # Load audio file
     audio_file = os.path.join(absolute_path, f'{file_num}.wav')
     y, _ = librosa.load(audio_file, sr=SAMPLE_RATE, duration=DURATION)
