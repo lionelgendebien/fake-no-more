@@ -16,9 +16,15 @@ def prepare_test_data(audio_test):
 
     # Set up sample rate for extraction
     SAMPLE_RATE = 16000
+    DURATION = 5
+    MAX_LEN = SAMPLE_RATE * DURATION
 
     # Extract y (audio wave)
     y, _ = librosa.load(audio_test, sr=SAMPLE_RATE)
+
+    # Extract 5'' at the mid-point
+    start_idx = (len(y) - MAX_LEN) // 2  # Calculate starting index for mid-point extraction
+    y = y[start_idx:start_idx + MAX_LEN]  # Extract the middle 5 seconds
 
     # Extract features
     mfccs = librosa.feature.mfcc(y=y, sr=SAMPLE_RATE, n_mfcc=20)
@@ -56,8 +62,14 @@ def prepare_test_data(audio_test):
     scaler = MinMaxScaler()
     X_test_scaled = scaler.fit_transform(X_test)
 
+    # Reshape
+    time_steps = 157  # Number of rows per audio file
+    num_audio = len(X_test_scaled) // time_steps
+    features = X_test_scaled.shape[1]# Number of features per row
+    X_reshaped = X_test_scaled.reshape(num_audio, time_steps, features)
+
     # Return df
-    return X_test_scaled
+    return X_reshaped
 
 def load_model(model):
     with open(f"{model}.pkl", 'rb') as file:
@@ -65,6 +77,11 @@ def load_model(model):
     return loaded_model
 
 # Use the loaded model
-def predict(loaded_model, X_test_scaled):
+def predict_X(loaded_model, X_test_scaled):
     predictions = loaded_model.predict(X_test_scaled)
-    return predictions
+    if predictions>0.5:
+        return 'FAKE'
+    elif predictions<0.5:
+        return 'REAL'
+    else:
+        return 'UNCLEAR'
