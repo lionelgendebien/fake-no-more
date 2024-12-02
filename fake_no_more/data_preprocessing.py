@@ -24,21 +24,19 @@ def split_train_test(X,y):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.20)
     return X_train, X_test, y_train, y_test
 
-def split_train_test_LSTM(X,y):
-    
+def split_train_test_LSTM(X, y):
     time_steps = 157  # Number of rows per audio file
-    print(time_steps.dtype)
+    print(type(time_steps))  # This will print <class 'int'>
     print(len(X))
-    num_audio = len(X)/time_steps  
-    print(time_steps.dtype)# Total number of audio files
+    num_audio = len(X) // time_steps
+    print(type(time_steps))# Total number of audio files
     features = X.shape[1]# Number of features per row
-    print(features.dtype)
+    print(type(features))
     test_size = math.ceil(num_audio * 0.2)
     print(test_size)
-    breakpoint()
     X_reshaped = X.reshape(num_audio, time_steps, features)
     y_grouped = y.reshape(-1, time_steps)[:, 0]  # Take the first label for each file
-    
+
     X_train, X_test, y_train, y_test = train_test_split(X_reshaped, y_grouped, test_size = test_size, random_state=42, shuffle=True)
     return X_train, X_test, y_train, y_test
 
