@@ -12,16 +12,17 @@ FROM python:3.10
 # FROM tensorflow/tensorflow:2.16.1
 
 # Copy everything we need into the image
-COPY fake_no_more fake_no_more
-COPY api api
 COPY requirements.txt requirements.txt
-COPY setup.py setup.py
+# COPY setup.py setup.py
 # COPY credentials.json credentials.json
 
 # Install everything
 RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install .
+# RUN pip install .
+
+COPY fake_no_more fake_no_more
+COPY api api
 
 # Make directories that we need, but that are not included in the COPY
 RUN mkdir /raw_data
