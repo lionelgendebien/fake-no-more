@@ -5,6 +5,7 @@ import numpy as np
 import time
 import random
 from audiorecorder import audiorecorder
+import requests 
 
 # --- Page Config ---
 st.set_page_config(
@@ -106,6 +107,11 @@ if uploaded_file:
     )
     st.write("\n\n\n")
     if st.button("Analyze Voice"):
+        
+        
+        
+        
+        
         with st.spinner("Analyzing..."):
             time.sleep(2)  # Simulate API response time
             prediction = random.choice(["This voice is real.", "This voice is AI."])  # Placeholder prediction
