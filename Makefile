@@ -48,8 +48,8 @@ docker_build_local:
 	docker build --tag=$(DOCKER_IMAGE_NAME):local .
 
 docker_run_local:
-	docker run \
-		-e PORT=8000 -p $(DOCKER_LOCAL_PORT):8000 \
+	docker run -it \
+		-e PORT=8050 -p $(DOCKER_LOCAL_PORT):8050 \
 		--env-file .env \
 		$(DOCKER_IMAGE_NAME):local
 

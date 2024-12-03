@@ -4,7 +4,19 @@ import os
 import pickle
 from fake_no_more.prediction_demo import prepare_test_data, load_model, predict_X
 
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI()
+
+#app.add_middleware(
+#    CORSMiddleware,
+#    allow_origins=["*"],  # Allows all origins
+#   allow_credentials=True,
+#   allow_methods=["*"],  # Allows all methods
+# allow_headers=["*"],  # Allows all headers
+#)
+
 
 # Define paths
 PROJECT_ROOT = os.path.abspath(os.path.join(os.getcwd()))
