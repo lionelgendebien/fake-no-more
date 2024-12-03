@@ -35,7 +35,15 @@ They capture temporal dependencies, handle long feature sequences, and identify 
 Document main API endpoints here
 
 # Setup instructions
-Document here for users who want to setup the package locally
+**Installation**
+To use this project, follow these steps:
+
+1. Clone the repository:
+   https://github.com/lionelgendebien/fake-no-more.git
+
+2. Download the audio files dataset:
+   You can download it [here](https://deepfake-total.com/in_the_wild).
+   
 
 # Usage
 Document main functionalities of the package here
