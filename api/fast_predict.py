@@ -17,7 +17,7 @@ if not os.path.exists(UPLOAD_DIR):
 
 # Load the model once when the app starts
 try:
-    model = load_model(MODEL_PATH)
+    app.state.model = load_model(MODEL_PATH)
 except Exception as e:
     raise RuntimeError(f"Failed to load model at {MODEL_PATH}: {e}")
 
@@ -36,11 +36,11 @@ async def upload_audio(file: UploadFile = File(...)):
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
 
-last_prediction = {"message": "No prediction made yet.", "prediction": None}
+#last_prediction = {"message": "No prediction made yet.", "prediction": None}
 
 @app.post("/predict-deepfake/")
 async def predict(file: UploadFile = File(...)):
-    global last_prediction
+    #global last_prediction
     try:
         # Save the uploaded file temporarily
         file_path = os.path.join(UPLOAD_DIR, file.filename)
@@ -52,10 +52,10 @@ async def predict(file: UploadFile = File(...)):
             X_test_scaled = prepare_test_data(file_path)
         except Exception as e:
             return JSONResponse(status_code=400, content={"error": f"Failed to process audio: {e}"})
-
+        
         # Predict using the loaded model
         try:
-            prediction = predict_X(model, X_test_scaled)
+            prediction = predict_X(app.state.model, X_test_scaled)
             last_prediction = {"message": "Prediction successful", "prediction": prediction}
         except Exception as e:
             return JSONResponse(status_code=500, content={"error": f"Prediction failed: {e}"})
@@ -71,6 +71,6 @@ async def predict(file: UploadFile = File(...)):
 def read_root():
     return {"message": "Welcome to the Audio File Upload API!"}
 
-@app.get("/predict-deepfake/")
-def get_last_prediction():
-    return JSONResponse(content=last_prediction)
+#@app.get("/predict-deepfake/")
+#def get_last_prediction():
+#    return JSONResponse(content=last_prediction)
