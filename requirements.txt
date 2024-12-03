@@ -21,10 +21,10 @@ uvicorn
 #Librosa
 librosa
 
-#Streamlit 
+#Streamlit
 streamlit
 
 #Moviepy and pytube
-pytube 
+pytube
 moviepy
 yt-dlp
