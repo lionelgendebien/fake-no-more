@@ -1,5 +1,4 @@
 # Fake No More 
-- Dataset taken from Fraunhofer AISEC: https://deepfake-total.com/in_the_wild
 - Document your project here
 
 ## Description
@@ -13,7 +12,7 @@ Deep fake voice, also known as voice synthesis or AI-generated voice, is a type 
 The process involves training models on large datasets of audio recordings of the target voice. Once the model is trained, it can generate new speech in the target voice based on any input text. This technology has advanced rapidly, making it possible to produce highly realistic and convincing audio that can mimic a specific individual.
 
 
-- Data used
+- Dataset taken from Fraunhofer AISEC: https://deepfake-total.com/in_the_wild
 - Where your API can be accessed
 - ...
 
