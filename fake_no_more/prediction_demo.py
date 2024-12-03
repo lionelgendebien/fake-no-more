@@ -85,3 +85,8 @@ def predict_X(loaded_model, X_test_scaled):
         return 'REAL'
     else:
         return 'UNCLEAR'
+
+# Predict probability
+def predict_prob(loaded_model, X_test_scaled):
+    predictions = loaded_model.predict(X_test_scaled)
+    return predictions
