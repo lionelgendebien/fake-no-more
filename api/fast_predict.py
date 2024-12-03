@@ -52,7 +52,7 @@ async def predict(file: UploadFile = File(...)):
             X_test_scaled = prepare_test_data(file_path)
         except Exception as e:
             return JSONResponse(status_code=400, content={"error": f"Failed to process audio: {e}"})
-
+        
         # Predict using the loaded model
         try:
             prediction = predict_X(app.state.model, X_test_scaled)

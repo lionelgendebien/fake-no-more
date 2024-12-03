@@ -17,14 +17,18 @@ keras==3.3.3
 # API
 fastapi
 uvicorn
+python-multipart
 
 #Librosa
 librosa
 
-#Streamlit 
+#Streamlit
 streamlit
+requests
 
 #Moviepy and pytube
-pytube 
+pytube
 moviepy
 yt-dlp
+pydub
+ffmpeg
