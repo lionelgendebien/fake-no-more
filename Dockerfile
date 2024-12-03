@@ -12,7 +12,7 @@ FROM python:3.10
 # FROM tensorflow/tensorflow:2.16.1
 
 # Copy everything we need into the image
-COPY packagename packagename
+COPY fake_no_more fake_no_more
 COPY api api
 COPY requirements.txt requirements.txt
 COPY setup.py setup.py
@@ -30,4 +30,4 @@ RUN mkdir /models
 # TODO: to speed up, you can load your model from MLFlow or Google Cloud Storage at startup using
 # RUN python -c 'replace_this_with_the_commands_you_need_to_run_to_load_the_model'
 
-CMD uvicorn api.fast:app --host 0.0.0.0 --port $PORT
+CMD uvicorn api.fast_predict:app --host 0.0.0.0 --port $PORT
