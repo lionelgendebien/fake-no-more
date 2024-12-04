@@ -26,7 +26,7 @@ Extracted features from the audio files:
 
 # Model
 ## LSTM
-LSTM networks are ideal for detecting fake voices because they analyize audio sequentially. 
+LSTM networks are ideal for detecting fake voices because they analyze audio sequentially. 
 They capture temporal dependencies, handle long feature sequences, and identify subtle inconsistencies in pitch or tone that differentiate real and AI-generated voices. 
 
 
