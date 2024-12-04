@@ -2,6 +2,13 @@ import pandas as pd
 import librosa
 from sklearn.preprocessing import MinMaxScaler
 import pickle
+from datetime import datetime
+
+try:
+    print("Avoiding lazy import", datetime.now())    
+    librosa.load("some_file.wav")
+except:
+    print("Nothing bad happened.just trying", datetime.now())
 
 # 'audio_test' argument takes the form of the full path of the wav test file
 def prepare_test_data(audio_test):
@@ -18,9 +25,10 @@ def prepare_test_data(audio_test):
     SAMPLE_RATE = 16000
     DURATION = 5
     MAX_LEN = SAMPLE_RATE * DURATION
-
+    print("before librosa", datetime.now())
     # Extract y (audio wave)
     y, _ = librosa.load(audio_test, sr=SAMPLE_RATE)
+    print("after librosa", datetime.now())
 
     # Extract 5'' at the mid-point
     start_idx = (len(y) - MAX_LEN) // 2  # Calculate starting index for mid-point extraction
@@ -34,6 +42,7 @@ def prepare_test_data(audio_test):
     spectral_bandwidth = librosa.feature.spectral_bandwidth(y=y, sr=SAMPLE_RATE)
     spectral_rolloff = librosa.feature.spectral_rolloff(y=y, sr=SAMPLE_RATE)
 
+    print("after features", datetime.now())
     # Create DataFrames for each feature
     mfccs_temp_df = pd.DataFrame(mfccs.T, columns=[f'mfcc_{i+1}' for i in range(mfccs.shape[0])])
     chroma_temp_df = pd.DataFrame(chroma_stft.T, columns=['chroma'])
@@ -50,6 +59,7 @@ def prepare_test_data(audio_test):
     spectral_bandwidth_df = pd.concat([spectral_bandwidth_df, spectral_bandwidth_temp_df], ignore_index=True)
     spectral_rolloff_df = pd.concat([spectral_rolloff_df, spectral_rolloff_temp_df], ignore_index=True)
 
+    print("before merge", datetime.now())
     # Merge all feature DataFrames on 'index'
     X_test = (mfccs_df
                 .merge(chroma_stft_df, left_index=True, right_index=True, how='inner')
@@ -58,10 +68,13 @@ def prepare_test_data(audio_test):
                 .merge(spectral_bandwidth_df, left_index=True, right_index=True, how='inner')
                 .merge(spectral_rolloff_df, left_index=True, right_index=True, how='inner'))
 
+    print("before minmax", datetime.now())
     # Apply min-max scaling
     scaler = MinMaxScaler()
+    print("before fit", datetime.now())
     X_test_scaled = scaler.fit_transform(X_test)
-
+    print("before fit", datetime.now())
+    
     # Reshape
     time_steps = 157  # Number of rows per audio file
     num_audio = len(X_test_scaled) // time_steps
