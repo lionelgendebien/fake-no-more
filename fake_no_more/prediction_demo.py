@@ -22,9 +22,8 @@ def prepare_test_data(audio_test):
     # Extract y (audio wave)
     y, _ = librosa.load(audio_test, sr=SAMPLE_RATE)
 
-    # Extract 5'' at the mid-point
-    start_idx = (len(y) - MAX_LEN) // 2  # Calculate starting index for mid-point extraction
-    y = y[start_idx:start_idx + MAX_LEN]  # Extract the middle 5 seconds
+    # Restrict to first 5''
+    y = y[:MAX_LEN]
 
     # Extract features
     mfccs = librosa.feature.mfcc(y=y, sr=SAMPLE_RATE, n_mfcc=20)
