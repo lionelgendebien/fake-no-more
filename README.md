@@ -41,5 +41,5 @@ To use this project, follow these steps:
    You can download it [here](https://deepfake-total.com/in_the_wild).
    
 
-# Usage
-Document main functionalities of the package here
+# API - Streamlit
+You can check do your prediction on [our model](https://fake-no-more.streamlit.app/).
