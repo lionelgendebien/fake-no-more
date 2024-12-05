@@ -65,7 +65,7 @@ def prepare_test_data(audio_test):
     time_steps = 157  # Number of rows per audio file
     num_audio = len(X_test) // time_steps
     features = X_test.shape[1]# Number of features per row
-    X_reshaped = X_test.reshape(num_audio, time_steps, features)
+    X_reshaped = X_test.to_numpy().reshape(num_audio, time_steps, features)
 
     # Return df
     return X_reshaped

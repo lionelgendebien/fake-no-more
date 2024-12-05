@@ -58,14 +58,12 @@ def split_train_val_LSTM(X_train, y_train):
 
 #     return X_train_scaled, X_test_scaled, X_val_scaled
 
-
-
 # Preprocess data
-def process_data_LSTM(df):
-    X, y =create_features_and_target(df)
-    y = y_encoding(y)
-    X_reshaped, y_reshaped = reshaping_X_LSTM(X,y)
-    X_train, X_test, y_train, y_test = split_train_test_LSTM(X, X_reshaped,y_reshaped)
-    X_train, X_val, y_train, y_val = split_train_val_LSTM(X_train,y_train)
-    # X_train_scaled, X_test_scaled, X_val_scaled=min_max_scaler_LSTM(X_train, X_test, X_val)
-    return X_train, X_test, X_val, y_train,y_test, y_val
+# def process_data_LSTM(df):
+#     X, y =create_features_and_target(df)
+#     y = y_encoding(y)
+#     X_reshaped, y_reshaped = reshaping_X_LSTM(X,y)
+#     X_train, X_test, y_train, y_test = split_train_test_LSTM(X, X_reshaped,y_reshaped)
+#     X_train, X_val, y_train, y_val = split_train_val_LSTM(X_train,y_train)
+#     # X_train_scaled, X_test_scaled, X_val_scaled=min_max_scaler_LSTM(X_train, X_test, X_val)
+#     return X_train, X_test, X_val, y_train,y_test, y_val
