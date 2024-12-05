@@ -1,19 +1,16 @@
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Input, LSTM, Dropout, Dense, Conv2D, BatchNormalization, Activation, MaxPooling2D, Flatten
+from tensorflow.keras.layers import Input, LSTM, Dropout, Dense
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import BinaryCrossentropy
 from tensorflow.keras.callbacks import EarlyStopping
-import matplotlib.pyplot as plt
-import seaborn as sns
 import pandas as pd
 import pickle
 
-from fake_no_more.data_preprocessing import process_data, process_data_LSTM
+from fake_no_more.data_preprocessing import process_data_LSTM
 
 def initialize_model_LSTM(X_train_scaled):
     model_LSTM = Sequential()
     model_LSTM.add(Input(shape=(X_train_scaled.shape[1], X_train_scaled.shape[2])))
-
 
     # First LSTM layer
     model_LSTM.add(LSTM(64, return_sequences=True))
@@ -57,14 +54,13 @@ def evaluate_LSTM(model):
 
 df=pd.read_parquet('raw_data/master_audio_df_balanced_all.parquet', engine='pyarrow')
 X_train_scaled, X_test_scaled, X_val_scaled, y_train, y_test, y_val=process_data_LSTM(df)
-print (X_train_scaled.shape, X_test_scaled.shape, X_val_scaled.shape, y_train.shape, y_test.shape, y_val.shape)
 model = initialize_model_LSTM(X_train_scaled)
 model = fit_LSTM(X_train_scaled, model)
 score = evaluate_LSTM(model)
 print(score)
 
 # Save the model
-with open('lstm.pkl', 'wb') as file:
+with open('lstm_new.pkl', 'wb') as file:
     pickle.dump(model, file)
 
 # # Load the model
