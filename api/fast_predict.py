@@ -20,7 +20,7 @@ app = FastAPI()
 
 # Define paths
 PROJECT_ROOT = os.path.abspath(os.path.join(os.getcwd()))
-MODEL_PATH = os.path.join(PROJECT_ROOT, "fake_no_more", "model_specifications", "lstm.pkl")
+MODEL_PATH = os.path.join(PROJECT_ROOT, "fake_no_more", "model_specifications", "lstm_new.pkl")
 UPLOAD_DIR = os.path.join(PROJECT_ROOT, "api", "uploaded_audio_files")
 
 # Ensure the upload directory exists
@@ -64,7 +64,7 @@ async def predict(file: UploadFile = File(...)):
             X_test_scaled = prepare_test_data(file_path)
         except Exception as e:
             return JSONResponse(status_code=400, content={"error": f"Failed to process audio: {e}"})
-        
+
         # Predict using the loaded model
         try:
             prediction = predict_X(app.state.model, X_test_scaled)
