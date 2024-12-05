@@ -30,10 +30,6 @@ LSTM networks are ideal for detecting fake voices because they analyze audio seq
 They capture temporal dependencies, handle long feature sequences, and identify subtle inconsistencies in pitch or tone that differentiate real and AI-generated voices. 
 
 
-
-# API
-Document main API endpoints here
-
 # Setup instructions
 **Installation**
 To use this project, follow these steps:
@@ -45,5 +41,5 @@ To use this project, follow these steps:
    You can download it [here](https://deepfake-total.com/in_the_wild).
    
 
-# Usage
-Document main functionalities of the package here
+# API - Streamlit
+You can check do your prediction on [our model](https://fake-no-more.streamlit.app/).

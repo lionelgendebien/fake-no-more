@@ -1,37 +1,45 @@
 import pandas as pd
 import librosa
-from sklearn.preprocessing import MinMaxScaler
-import pickle
-from datetime import datetime
+import os
+import numpy as np
 
-try:
-    print("Avoiding lazy import", datetime.now())
-    librosa.load("some_file.wav")
-except:
-    print("Nothing bad happened.just trying", datetime.now())
+# Current working directory
+current_dir = os.getcwd()
 
-# 'audio_test' argument takes the form of the full path of the wav test file
-def prepare_test_data(audio_test):
+# Define relative path
+relative_path = "raw_data/release_in_the_wild/"
 
-    # Create a DataFrame for each feature
-    mfccs_df = pd.DataFrame()
-    chroma_stft_df = pd.DataFrame()
-    spectral_contrast_df = pd.DataFrame()
-    zero_crossing_rate_df = pd.DataFrame()
-    spectral_bandwidth_df = pd.DataFrame()
-    spectral_rolloff_df = pd.DataFrame()
+# Define absolute path
+absolute_path = os.path.join(current_dir, relative_path)
 
-    # Set up sample rate for extraction
-    SAMPLE_RATE = 16000
-    DURATION = 5
-    MAX_LEN = SAMPLE_RATE * DURATION
-    print("before librosa", datetime.now())
-    # Extract y (audio wave)
-    y, _ = librosa.load(audio_test, sr=SAMPLE_RATE)
-    print("after librosa", datetime.now())
+# Create a DataFrame for each feature
+mfccs_df = pd.DataFrame()
+chroma_stft_df = pd.DataFrame()
+spectral_contrast_df = pd.DataFrame()
+zero_crossing_rate_df = pd.DataFrame()
+spectral_bandwidth_df = pd.DataFrame()
+spectral_rolloff_df = pd.DataFrame()
 
-    # Restrict to first 5''
-    y = y[:MAX_LEN]
+# Apply filters on audio files
+csv_path="raw_data/data_mapping.csv"
+mapping_file=pd.read_csv(csv_path)
+
+# Drop audio files of less than 1''
+mapping_file_filtered = mapping_file[mapping_file['audio_length'] < 1]
+
+# Create load and preprocess function
+SAMPLE_RATE = 16000
+DURATION = 25
+MAX_LEN = SAMPLE_RATE * DURATION
+
+for file_num in mapping_file_filtered.file_index:
+    # Load audio file
+    audio_file = os.path.join(absolute_path, f'{file_num}.wav')
+    y, _ = librosa.load(audio_file, sr=SAMPLE_RATE)
+
+    # Apply padding to the audio signal
+    if len(y) < MAX_LEN:
+        y = np.pad(y, (0, MAX_LEN - len(y)), mode='constant')
 
     # Extract features
     mfccs = librosa.feature.mfcc(y=y, sr=SAMPLE_RATE, n_mfcc=20)
@@ -41,13 +49,18 @@ def prepare_test_data(audio_test):
     spectral_bandwidth = librosa.feature.spectral_bandwidth(y=y, sr=SAMPLE_RATE)
     spectral_rolloff = librosa.feature.spectral_rolloff(y=y, sr=SAMPLE_RATE)
 
-    print("after features", datetime.now())
     # Create DataFrames for each feature
     mfccs_temp_df = pd.DataFrame(mfccs.T, columns=[f'mfcc_{i+1}' for i in range(mfccs.shape[0])])
+    mfccs_temp_df['file_index'] = file_num
+
     chroma_temp_df = pd.DataFrame(chroma_stft.T, columns=['chroma'])
+
     spectral_contrast_temp_df = pd.DataFrame(spectral_contrast.T, columns=[f'spectral_contrast_band_{i+1}' for i in range(spectral_contrast.shape[0])])
+
     zero_crossing_temp_df = pd.DataFrame(zero_crossing_rate.T, columns=['zero_crossing_rate'])
+
     spectral_bandwidth_temp_df = pd.DataFrame(spectral_bandwidth.T, columns=['spectral_bandwidth'])
+
     spectral_rolloff_temp_df = pd.DataFrame(spectral_rolloff.T, columns=['spectral_rolloff'])
 
     # Concatenate to main DataFrames
@@ -58,47 +71,23 @@ def prepare_test_data(audio_test):
     spectral_bandwidth_df = pd.concat([spectral_bandwidth_df, spectral_bandwidth_temp_df], ignore_index=True)
     spectral_rolloff_df = pd.concat([spectral_rolloff_df, spectral_rolloff_temp_df], ignore_index=True)
 
-    print("before merge", datetime.now())
-    # Merge all feature DataFrames on 'index'
-    X_test = (mfccs_df
+    # Merge all feature DataFrames on 'file_index'
+    merged_df = (mfccs_df
                 .merge(chroma_stft_df, left_index=True, right_index=True, how='inner')
                 .merge(spectral_contrast_df, left_index=True, right_index=True, how='inner')
                 .merge(zero_crossing_rate_df, left_index=True, right_index=True, how='inner')
                 .merge(spectral_bandwidth_df, left_index=True, right_index=True, how='inner')
                 .merge(spectral_rolloff_df, left_index=True, right_index=True, how='inner'))
 
-    print("before minmax", datetime.now())
-    # Apply min-max scaling
-    scaler = MinMaxScaler()
-    print("before fit", datetime.now())
-    X_test_scaled = scaler.fit_transform(X_test)
-    print("before fit", datetime.now())
+# Import the label (Fake or Real)
+mapping_file_filtered['file_index']=mapping_file_filtered['file'].str.replace('.wav', '', regex=False).astype(int)
+mapping_file_filtered=mapping_file_filtered.drop(columns='file')
 
-    # Reshape
-    time_steps = 157  # Number of rows per audio file
-    num_audio = len(X_test) // time_steps
-    features = X_test.shape[1]# Number of features per row
-    X_reshaped = X_test.to_numpy().reshape(num_audio, time_steps, features)
+# Merge to retrieve label
+master_audio_df_all=merged_df.merge(mapping_file_filtered, on='file_index',how='inner')
 
-    # Return df
-    return X_reshaped
+# Print final DataFrame
+print(master_audio_df_all)
 
-def load_model(model_path):
-    with open(model_path, 'rb') as file:
-        loaded_model = pickle.load(file)
-    return loaded_model
-
-# Use the loaded model
-def predict_X(loaded_model, X_test):
-    predictions = loaded_model.predict(X_test)
-    if predictions>0.5:
-        return 'FAKE'
-    elif predictions<0.5:
-        return 'REAL'
-    else:
-        return 'UNCLEAR'
-
-# Predict probability
-def predict_prob(loaded_model, X_test):
-    predictions = loaded_model.predict(X_test)
-    return predictions
+# Export as Parquet file
+master_audio_df_all.to_parquet('raw_data/master_audio_df_total_padded.parquet', engine='pyarrow')

@@ -1,5 +1,5 @@
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Input, LSTM, Dropout, Dense, Normalization
+from tensorflow.keras.layers import Input, LSTM, Dropout, Dense
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import BinaryCrossentropy
 from tensorflow.keras.callbacks import EarlyStopping
@@ -8,16 +8,12 @@ import pickle
 
 from fake_no_more.data_preprocessing import process_data_LSTM
 
-def initialize_model_LSTM(X_train):
-    normalizer = Normalization()
-    normalizer.adapt(X_train)
-
+def initialize_model_LSTM(X_train_scaled):
     model_LSTM = Sequential()
-
-    model_LSTM.add(normalizer)
+    model_LSTM.add(Input(shape=(X_train_scaled.shape[1], X_train_scaled.shape[2])))
 
     # First LSTM layer
-    model_LSTM.add(LSTM(64, return_sequences=True, input_shape=(X_train.shape[1], X_train.shape[2])))
+    model_LSTM.add(LSTM(64, return_sequences=True))
     model_LSTM.add(Dropout(0.2))
 
     # Second LSTM layer
@@ -47,19 +43,19 @@ def initialize_model_LSTM(X_train):
     model_LSTM.compile(optimizer=optimizer, loss=BinaryCrossentropy(), metrics=['accuracy', 'precision', 'recall'])
     return model_LSTM
 
-def fit_LSTM(X_train, model):
+def fit_LSTM(X_train_scaled, model):
     callback = EarlyStopping(patience= 15, restore_best_weights = True)
-    model.fit(X_train, y_train, epochs=50, callbacks = callback, validation_data=(X_val, y_val))
+    model.fit(X_train_scaled, y_train, epochs=50, callbacks = callback, validation_data=(X_val_scaled, y_val))
     return model
 
 def evaluate_LSTM(model):
-    score = model.evaluate(X_test, y_test)
+    score = model.evaluate(X_test_scaled, y_test)
     return score
 
 df=pd.read_parquet('raw_data/master_audio_df_balanced_all.parquet', engine='pyarrow')
-X_train, X_test, X_val, y_train, y_test, y_val=process_data_LSTM(df)
-model = initialize_model_LSTM(X_train)
-model = fit_LSTM(X_train, model)
+X_train_scaled, X_test_scaled, X_val_scaled, y_train, y_test, y_val=process_data_LSTM(df)
+model = initialize_model_LSTM(X_train_scaled)
+model = fit_LSTM(X_train_scaled, model)
 score = evaluate_LSTM(model)
 print(score)
 
@@ -68,7 +64,7 @@ with open('lstm_new.pkl', 'wb') as file:
     pickle.dump(model, file)
 
 # # Load the model
-# with open('lstm_new.pkl', 'rb') as file:
+# with open('lstm.pkl', 'rb') as file:
 #     loaded_model = pickle.load(file)
 
 # # Use the loaded model

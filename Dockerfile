@@ -23,6 +23,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY fake_no_more fake_no_more
 COPY api api
+COPY some_file.wav some_file.wav
 
 # Make directories that we need, but that are not included in the COPY
 RUN mkdir /raw_data
