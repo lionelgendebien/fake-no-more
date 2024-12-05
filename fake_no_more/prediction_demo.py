@@ -5,7 +5,7 @@ import pickle
 from datetime import datetime
 
 try:
-    print("Avoiding lazy import", datetime.now())    
+    print("Avoiding lazy import", datetime.now())
     librosa.load("some_file.wav")
 except:
     print("Nothing bad happened.just trying", datetime.now())
@@ -73,12 +73,12 @@ def prepare_test_data(audio_test):
     print("before fit", datetime.now())
     X_test_scaled = scaler.fit_transform(X_test)
     print("before fit", datetime.now())
-    
+
     # Reshape
     time_steps = 157  # Number of rows per audio file
-    num_audio = len(X_test_scaled) // time_steps
-    features = X_test_scaled.shape[1]# Number of features per row
-    X_reshaped = X_test_scaled.reshape(num_audio, time_steps, features)
+    num_audio = len(X_test) // time_steps
+    features = X_test.shape[1]# Number of features per row
+    X_reshaped = X_test.reshape(num_audio, time_steps, features)
 
     # Return df
     return X_reshaped
@@ -89,8 +89,8 @@ def load_model(model_path):
     return loaded_model
 
 # Use the loaded model
-def predict_X(loaded_model, X_test_scaled):
-    predictions = loaded_model.predict(X_test_scaled)
+def predict_X(loaded_model, X_test):
+    predictions = loaded_model.predict(X_test)
     if predictions>0.5:
         return 'FAKE'
     elif predictions<0.5:
@@ -99,6 +99,6 @@ def predict_X(loaded_model, X_test_scaled):
         return 'UNCLEAR'
 
 # Predict probability
-def predict_prob(loaded_model, X_test_scaled):
-    predictions = loaded_model.predict(X_test_scaled)
+def predict_prob(loaded_model, X_test):
+    predictions = loaded_model.predict(X_test)
     return predictions
