@@ -12,8 +12,6 @@ The process involves training models on large datasets of audio recordings of th
 
 
 - Dataset taken from Fraunhofer AISEC: https://deepfake-total.com/in_the_wild
-- Where your API can be accessed
-- ...
 
 # Preprocessing
 Extracted features from the audio files:
